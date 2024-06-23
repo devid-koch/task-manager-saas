@@ -2,12 +2,13 @@ import { Request, Response } from "express";
 import { v4 as uuidv4 } from "uuid";
 import {
   addTaskToUser,
+  deleteTask,
   getTask,
   getTasks,
   updateTask,
 } from "../services/database";
 import { Task } from "../models";
-import { runEffect } from "../utils/effectUtils";
+import { runEffect, runEffectWithMessage } from "../utils/effectUtils";
 import * as T from "@effect-ts/core/Effect";
 import { pipe } from "@effect-ts/core/Function";
 
@@ -33,7 +34,7 @@ export const createTask = (req: Request, res: Response) => {
     }),
     T.chain((task) => addTaskToUser(user_id, task))
   );
-  runEffect(effect, res, "Task created successfully");
+  runEffectWithMessage(effect, res, "Task created successfully");
 };
 
 export const listTasks = (req: Request, res: Response) => {
@@ -71,4 +72,10 @@ export const updateTaskById = (req: Request, res: Response) => {
   }
   const effect = updateTask(user_id, task_id, req.body);
   runEffect(effect, res, "Task updated successfully");
+};
+
+export const deleteTaskById = (req: Request, res: Response) => {
+  const { user_id, task_id } = req.params;
+  const effect = deleteTask(user_id, task_id);
+  runEffectWithMessage(effect, res, "Task Deleted successfully");
 };

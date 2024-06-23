@@ -70,3 +70,24 @@ export const updateTask = (
       )
     )
   );
+
+export const deleteTask = (user_id: string, task_id: string) =>
+  pipe(
+    getUser(user_id),
+    T.chain(
+      O.fold(
+        () => T.fail(new Error("User not found")),
+        (user) =>
+          T.succeedWith(() => {
+            const updatedTasks = new Map(user.tasks);
+            updatedTasks.delete(task_id);
+            const updatedUser = {
+              ...user,
+              tasks: updatedTasks,
+            };
+            users.set(user.id, updatedUser);
+            return updatedUser;
+          })
+      )
+    )
+  );

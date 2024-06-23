@@ -3,6 +3,7 @@ import bodyParser from "body-parser";
 import { createUser } from "./controllers/userController";
 import {
   createTask,
+  deleteTaskById,
   getTaskById,
   listTasks,
   updateTaskById,
@@ -18,5 +19,7 @@ app.post("/users/:user_id/tasks", createTask);
 app.get("/users/:user_id/tasks", listTasks);
 app.get("/users/:user_id/tasks/:task_id", getTaskById);
 app.put("/users/:user_id/tasks/:task_id", updateTaskById);
+
+app.delete("/users/:user_id/tasks/:task_id", deleteTaskById);
 
 export default app;

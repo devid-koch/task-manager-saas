@@ -16,3 +16,19 @@ export const runEffect = <E, A>(
     }
   });
 };
+
+export const runEffectWithMessage = <E, A>(
+  effect: T.Effect<unknown, E, A>,
+  res: Response,
+  successMessage: string
+): void => {
+  T.run(effect, (exit) => {
+    if (exit._tag === "Failure") {
+      res
+        .status(500)
+        .json({ error: `Failed to process request: ${exit.cause._tag}` });
+    } else if (exit._tag === "Success") {
+      res.status(200).json({ message: successMessage });
+    }
+  });
+};
