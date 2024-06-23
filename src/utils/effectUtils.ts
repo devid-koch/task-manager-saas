@@ -1,18 +1,18 @@
-import { Effect } from "@effect-ts/core/Effect";
-import { pipe } from "@effect-ts/core/Function";
-import * as T from "@effect-ts/core/Effect";
 import { Response } from "express";
+import * as T from "@effect-ts/core/Effect";
 
-export const runEffect = <A>(
-  effect: Effect<unknown, Error, A>,
-  res: Response
+export const runEffect = <E, A>(
+  effect: T.Effect<unknown, E, A>,
+  res: Response,
+  operation: string
 ): void => {
-  pipe(effect, T.runPromise).then(
-    (result) => {
-      res.json(result);
-    },
-    (error) => {
-      res.status(500).send({ error: error.message });
+  T.run(effect, (exit) => {
+    if (exit._tag === "Failure") {
+      res
+        .status(500)
+        .json({ error: `Failed to ${operation}: ${exit.cause._tag}` });
+    } else {
+      res.status(200).json({ message: `${operation}`, result: exit.value });
     }
-  );
+  });
 };

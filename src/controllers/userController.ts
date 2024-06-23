@@ -27,5 +27,5 @@ export const createUser = (req: Request, res: Response) => {
     }),
     T.chain(addUser)
   );
-  runEffect(effect, res);
+  runEffect(effect, res, "User created successfully");
 };

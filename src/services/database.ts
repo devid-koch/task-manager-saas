@@ -32,3 +32,41 @@ export const addTaskToUser = (userId: string, task: Task) =>
       )
     )
   );
+
+export const getTasks = (userId: string) =>
+  pipe(
+    getUser(userId),
+    T.map(O.map((user) => Array.from(user.tasks.values())))
+  );
+
+export const getTask = (userId: string, taskId: string) =>
+  pipe(
+    getUser(userId),
+    T.map(O.chain((user) => O.fromNullable(user.tasks.get(taskId))))
+  );
+
+export const updateTask = (
+  userId: string,
+  taskId: string,
+  updatedTask: Partial<Task>
+) =>
+  pipe(
+    getUser(userId),
+    T.chain(
+      O.fold(
+        () => T.fail(new Error("User not found")),
+        (user) =>
+          T.succeedWith(() => {
+            const task = user.tasks.get(taskId);
+            if (!task) throw new Error("Task not found");
+            const newTask = { ...task, ...updatedTask };
+            const updatedUser = {
+              ...user,
+              tasks: new Map(user.tasks).set(taskId, newTask),
+            };
+            users.set(user.id, updatedUser);
+            return newTask;
+          })
+      )
+    )
+  );
