@@ -5,18 +5,16 @@ import { User } from "../models";
 import { runEffect } from "../utils/effectUtils";
 import * as T from "@effect-ts/core/Effect";
 import { pipe } from "@effect-ts/core/Function";
+import { validateRequiredFields } from "../utils/validation";
 
 export const createUser = (req: Request, res: Response) => {
   const { name, email } = req.body;
 
-  if (!name && !email) {
-    return res
-      .status(400)
-      .json({ error: "Name and email are required fields." });
-  } else if (!name) {
-    return res.status(400).json({ error: "Name is a required field." });
-  } else if (!email) {
-    return res.status(400).json({ error: "Email is a required field." });
+  const requiredFields = ["name", "email"];
+  const validation = validateRequiredFields(requiredFields, req.body);
+
+  if (!validation.valid) {
+    return res.status(400).json({ error: validation.error });
   }
 
   const effect = pipe(
